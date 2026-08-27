@@ -24,12 +24,19 @@ const App = () => {
 
   const [votes, setVotes] = useState(Array(8).fill(0))
 
+  const mostVotes = Math.max(...votes)
+  const mostVotesIndex = votes.indexOf(mostVotes)
+
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       <p>{anecdotes[selected]}</p>
       <p>has {votes[selected]} votes</p>
       <button onClick={() =>  setVotes(vote(selected, votes))}>vote</button>
       <button onClick={() => setSelected(Math.floor(Math.random() * (Math.ceil(8) - Math.floor(0))))}>next</button>
+      <h1>Most voted anecdote</h1>
+      <p>{anecdotes[mostVotesIndex]}</p>
+      <p>has {mostVotes} votes</p>
     </div>
   )
 }
