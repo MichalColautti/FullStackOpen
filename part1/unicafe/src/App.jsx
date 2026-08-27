@@ -6,23 +6,37 @@ const Button = (props) => {
   )
 }
 
+const average = (n,all) => {
+  return n/all
+}
+
+const percent = (n,all) => {
+  return (n * 100) / all
+}
+
+const Statistics = (props) => {
+  const good = props.good
+  const neutral = props.neutral
+  const bad = props.bad
+  const all = good + neutral + bad
+
+  return (
+    <div>
+      <p>good {good}</p>
+      <p>neutral {neutral}</p>
+      <p>bad {bad}</p>
+      <p>all {all}</p>
+      <p>average {average(good-bad,all)}</p>
+      <p>positive {percent(good,all)}</p>
+    </div>
+  )
+}
+
 const App = () => {
   // save clicks of each button to its own state
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
-  
-  const allOpinions = () => {
-    return good + neutral + bad
-  }
-
-  const average = (n,all) => {
-    return n/all
-  }
-
-  const percent = (n,all) => {
-    return (n * 100) / all
-  }
 
   return (
     <div>
@@ -34,12 +48,7 @@ const App = () => {
 
       <h1>statistics</h1>
 
-      <p>good {good}</p>
-      <p>neutral {neutral}</p>
-      <p>bad {bad}</p>
-      <p>all {allOpinions()}</p>
-      <p>average {average(good-bad,allOpinions())}</p>
-      <p>positive {percent(good,allOpinions())}</p>
+      <Statistics good={good} neutral={neutral} bad={bad}></Statistics>
     </div>
   )
 }
