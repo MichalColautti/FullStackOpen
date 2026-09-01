@@ -24,20 +24,23 @@ const Part = (props) => {
   )
 }
 
-/*const Total = (props) => {
+const Total = (props) => {
+  let total = 0
+  props.course.parts.forEach(part => total += part.exercises)
+
   return (
     <>
-      <p>Number of exercises {props.course.parts[0].exercises + props.course.parts[1].exercises + props.course.parts[2].exercises}</p>
+      <p>Number of exercises {total}</p>
     </>
   )
-}*/
+}
 
 const Course = ({course}) => {
   return (
     <>
       <Header course={course} />
       <Content course={course} />
-      {/* <Total course={course} /> */}
+      <Total course={course} /> 
     </>
   )
 }
