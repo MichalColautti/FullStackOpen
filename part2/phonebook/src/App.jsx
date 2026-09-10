@@ -53,6 +53,21 @@ const App = () => {
     setNewPhoneNumber(e.target.value);
   };
 
+  const handleDeletePerson = (person) => {
+    const id = person.id
+    if(window.confirm(`do you want to delete ${person.name}`)) {
+      personService
+      .remove(person.id)
+      .then(response => {
+        console.log(response)
+        setPersons(persons.filter(person => person.id !== id))
+      })
+      .catch(error => {
+        console.log(error.message)
+      })
+    }
+  };
+
   const personsToShow =
     newFilter === ""
       ? persons
@@ -73,7 +88,7 @@ const App = () => {
         AddNewPerson={AddNewPerson}
       />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} handleDeletePerson={handleDeletePerson} />
     </div>
   );
 };
