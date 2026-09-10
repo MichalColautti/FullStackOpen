@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Filter from "./components/Filter.jsx";
 import PersonForm from "./components/PersonForm.jsx";
 import Persons from "./components/Persons.jsx";
-import personService from "./services/persons.js"
+import personService from "./services/persons.js";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,18 +11,43 @@ const App = () => {
   const [newFilter, setNewFilter] = useState("");
 
   useEffect(() => {
-    personService
-    .getAll()
-    .then(initialPersons => {
-      setPersons(initialPersons)
-    })
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
+    });
   }, []);
 
   const AddNewPerson = (event) => {
     event.preventDefault();
 
-    if (persons.some((e) => e.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+    if (
+      persons.some(
+        (person) => person.name === newName && person.number === newPhoneNumber,
+      )
+    ) {
+      alert(
+        `${newName} is already added to phonebook with the same phone number`,
+      );
+      return;
+    } else if (persons.some((person) => person.name === newName)) {
+      const existingPerson = persons.find((person) => person.name === newName);
+      const newPerson = { ...existingPerson, number: newPhoneNumber };
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(existingPerson.id, newPerson)
+          .then((response) => {
+            console.log(response);
+            setPersons(
+              persons.map((person) => 
+                person.id === existingPerson.id ? newPerson : person
+              ),
+            );
+            setNewName("");
+            setNewPhoneNumber("");
+          })
+          .catch((error) => {
+            console.log(error.message);
+          });
+        }
       return;
     }
 
@@ -31,14 +56,12 @@ const App = () => {
       number: newPhoneNumber,
     };
 
-    personService
-      .create(personObject)
-      .then(newPerson => {
-        console.log(newPerson)
-        setPersons(persons.concat(newPerson));
-        setNewName("");
-        setNewPhoneNumber("");
-      })
+    personService.create(personObject).then((newPerson) => {
+      console.log(newPerson);
+      setPersons(persons.concat(newPerson));
+      setNewName("");
+      setNewPhoneNumber("");
+    });
   };
 
   const handleFilterChange = (e) => {
@@ -54,17 +77,17 @@ const App = () => {
   };
 
   const handleDeletePerson = (person) => {
-    const id = person.id
-    if(window.confirm(`do you want to delete ${person.name}`)) {
+    const id = person.id;
+    if (window.confirm(`do you want to delete ${person.name}`)) {
       personService
-      .remove(person.id)
-      .then(response => {
-        console.log(response)
-        setPersons(persons.filter(person => person.id !== id))
-      })
-      .catch(error => {
-        console.log(error.message)
-      })
+        .remove(person.id)
+        .then((response) => {
+          console.log(response);
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
     }
   };
 
@@ -88,7 +111,10 @@ const App = () => {
         AddNewPerson={AddNewPerson}
       />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} handleDeletePerson={handleDeletePerson} />
+      <Persons
+        personsToShow={personsToShow}
+        handleDeletePerson={handleDeletePerson}
+      />
     </div>
   );
 };
