@@ -6,7 +6,7 @@ import personService from "./services/persons.js";
 import Notification from "./components/Notification.jsx";
 
 const App = () => {
-  const [persons, setPersons] = useState([]);
+  const [persons, setPersons] = useState(null);
   const [newName, setNewName] = useState("");
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
@@ -117,6 +117,8 @@ const App = () => {
       : persons.filter((person) =>
           person.name.toLowerCase().includes(newFilter.toLowerCase()),
         );
+
+  if(persons == null) return null
 
   return (
     <div>
