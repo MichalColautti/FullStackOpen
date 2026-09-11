@@ -45,9 +45,9 @@ const App = () => {
             );
         
             setNotification(`Replaced ${newName} old number with a new one.`)
-            // setTimeout(() => {
-            //   setNotification("")
-            // }, 5000)
+            setTimeout(() => {
+              setNotification("")
+            }, 5000)
             setNewName("");
             setNewPhoneNumber("");
           })
