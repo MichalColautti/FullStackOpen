@@ -11,6 +11,7 @@ const App = () => {
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
   const [notification, setNotification] = useState("")
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -100,6 +101,12 @@ const App = () => {
         })
         .catch((error) => {
           console.log(error.message);
+          setNotification(error.message)
+          setError(true)
+          setTimeout(() => {
+            setNotification("")
+            setError(false)
+          }, 5000)
         });
     }
   };
@@ -114,7 +121,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification message={notification} isError={error}/>
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
       <h2>Add a new</h2>
       <PersonForm
