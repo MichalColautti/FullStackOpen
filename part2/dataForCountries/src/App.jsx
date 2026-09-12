@@ -22,6 +22,10 @@ function App() {
     return null;
   }
 
+  const handleShowCountry = (country) => {
+    setSearchBar(country)
+  }
+
   const countriesToShow =
     searchBar == ""
       ? countries
@@ -71,7 +75,7 @@ function App() {
         searchBar={searchBar}
         handleSetSearchBar={handleSetSearchBar}
       />
-      <CountriesList countriesToShow={countriesToShow} />
+      <CountriesList countriesToShow={countriesToShow} handleShowCountry={handleShowCountry}/>
     </>
   );
 }
