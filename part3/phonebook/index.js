@@ -37,6 +37,18 @@ app.get('/info', (request, response) => {
         <p>${date}</p>
     `)
 })
+app.get('/api/persons/:id', (request, response) => {
+    const id = request.params.id
+    const person = persons.find((person) => person.id === id)
+    
+    if(person === undefined) {
+        return response.status(404).json({
+            error: 'person not found'
+        })
+    }
+
+    response.json(person)
+})
 
 const PORT = 3001
 app.listen(PORT, () => {
