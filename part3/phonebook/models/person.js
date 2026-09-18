@@ -21,7 +21,16 @@ const personSchema = new mongoose.Schema({
     minLength: 3,
     required: true,
   },
-  number: String,
+  number: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        return /^\d{2,3}-\d+$/.test(v) && v.length >= 8;
+      }
+    },
+    required: true,
+    message: 'invalid phone number, phone number must have 2-3 digits followed by '-' and remaining digits, with a minimum length of 8'
+  }
 })
 
 personSchema.set('toJSON', {
