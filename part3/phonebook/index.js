@@ -43,43 +43,35 @@ app.get("/api/persons/:id", (request, response) => {
   });
 });
 
-// app.delete('/api/persons/:id', (request, response) => {
-//     const id = request.params.id
-//     persons = persons.filter((person) => person.id !== id)
+app.delete('/api/persons/:id', (request, response) => {
+    const id = request.params.id
+    Person.findByIdAndDelete(id)
+    .then(result => {
+        console.log(result)
+        response.status(204).end()
+    })
 
-//     response.status(204).end()
-// })
+    response.status(204).end()
+})
 
-// const generateId = () => {
-//     return String(Math.floor(Math.random() * 10000))
-// }
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+    console.log(body)
+    if (!body.name || !body.number) {
+        return response.status(400).json({
+            error: 'name or number missing'
+        })
+    }
 
-// app.post('/api/persons', (request, response) => {
-//     const body = request.body
-//     console.log(body)
+    const newPerson = new Person({
+        name: body.name,
+        number: body.number,
+    })
 
-//     if(!body.name || !body.number) {
-//         return response.status(400).json({
-//             error: 'name or number missing'
-//         })
-//     }
-
-//     if(persons.some((person) => person.name === body.name)) {
-//         return response.status(400).json({
-//             error: 'name already in phonebook'
-//         })
-//     }
-
-//     const newPerson = {
-//         id: generateId(),
-//         name: body.name,
-//         number: body.number,
-//     }
-
-//     persons = persons.concat(newPerson)
-
-//     response.json(newPerson)
-// })
+    newPerson.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
+})
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
