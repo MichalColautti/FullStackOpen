@@ -10,8 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
-  const [notification, setNotification] = useState("")
-  const [error, setError] = useState(false)
+  const [notification, setNotification] = useState("");
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -34,28 +34,38 @@ const App = () => {
     } else if (persons.some((person) => person.name === newName)) {
       const existingPerson = persons.find((person) => person.name === newName);
       const newPerson = { ...existingPerson, number: newPhoneNumber };
-      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`,
+        )
+      ) {
         personService
           .update(existingPerson.id, newPerson)
           .then((response) => {
             console.log(response);
             setPersons(
-              persons.map((person) => 
-                person.id === existingPerson.id ? newPerson : person
+              persons.map((person) =>
+                person.id === existingPerson.id ? newPerson : person,
               ),
             );
-        
-            setNotification(`Replaced ${newName} old number with a new one.`)
+
+            setNotification(`Replaced ${newName} old number with a new one.`);
             setTimeout(() => {
-              setNotification("")
-            }, 5000)
+              setNotification("");
+            }, 5000);
             setNewName("");
             setNewPhoneNumber("");
           })
           .catch((error) => {
             console.log(error.message);
+            setNotification(error.response.data.error);
+            setError(true);
+            setTimeout(() => {
+              setNotification("");
+              setError(false);
+            }, 5000);
           });
-        }
+      }
 
       return;
     }
@@ -65,17 +75,28 @@ const App = () => {
       number: newPhoneNumber,
     };
 
-    personService.create(personObject).then((newPerson) => {
-      console.log(newPerson);
-      setPersons(persons.concat(newPerson));
-      setNewName("");
-      setNewPhoneNumber("");
+    personService
+      .create(personObject)
+      .then((newPerson) => {
+        console.log(newPerson);
+        setPersons(persons.concat(newPerson));
+        setNewName("");
+        setNewPhoneNumber("");
 
-      setNotification("A new person has been added.")
-      setTimeout(() => {
-        setNotification("")
-      },5000)
-    });
+        setNotification("A new person has been added.");
+        setTimeout(() => {
+          setNotification("");
+        }, 5000);
+      })
+      .catch((error) => {
+        console.log(error.response.data.error);
+        setNotification(error.response.data.error);
+        setError(true);
+        setTimeout(() => {
+          setNotification("");
+          setError(false);
+        }, 5000);
+      });
   };
 
   const handleFilterChange = (e) => {
@@ -101,12 +122,12 @@ const App = () => {
         })
         .catch((error) => {
           console.log(error.message);
-          setNotification(error.message)
-          setError(true)
+          setNotification(error.message);
+          setError(true);
           setTimeout(() => {
-            setNotification("")
-            setError(false)
-          }, 5000)
+            setNotification("");
+            setError(false);
+          }, 5000);
         });
     }
   };
@@ -118,12 +139,12 @@ const App = () => {
           person.name.toLowerCase().includes(newFilter.toLowerCase()),
         );
 
-  if(persons == null) return null
+  if (persons == null) return null;
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} isError={error}/>
+      <Notification message={notification} isError={error} />
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
       <h2>Add a new</h2>
       <PersonForm
