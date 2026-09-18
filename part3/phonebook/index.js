@@ -1,108 +1,87 @@
-const express = require('express')
-const morgan = require('morgan')
-const cors = require('cors')
-const path = require('path')
+require("dotenv").config();
 
-const app = express()
+const express = require("express");
+const morgan = require("morgan");
+const cors = require("cors");
+const path = require("path");
+const Person = require("./models/person");
 
-app.use(express.json())
-app.use(cors())
-app.use(express.static(path.join(__dirname, 'dist')))
+const app = express();
 
-morgan.token('body', (req) => {
-    return req.method === 'POST' ? JSON.stringify(req.body) : ''
-})
+app.use(express.json());
+app.use(cors());
+app.use(express.static(path.join(__dirname, "dist")));
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+morgan.token("body", (req) => {
+  return req.method === "POST" ? JSON.stringify(req.body) : "";
+});
 
-let persons = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms :body"),
+);
 
-app.get('/api/persons', (request, response) => {
-    response.json(persons)
-})
+app.get("/api/persons", (request, response) => {
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
+});
 
-app.get('/info', (request, response) => {
-    const numberOfPeople = persons.length
-    const date = new Date()
-
+app.get("/info", (request, response) => {
+  Person.countDocuments({}).then((count) => {
+    const date = new Date();
     response.send(`
-        <p>Phone book has info for ${numberOfPeople} people</p>
+        <p>Phone book has info for ${count} people</p>
         <p>${date}</p>
-    `)
-})
-app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    const person = persons.find((person) => person.id === id)
-    
-    if(person === undefined) {
-        return response.status(404).json({
-            error: 'person not found'
-        })
-    }
+    `);
+  });
+});
 
-    response.json(person)
-})
+app.get("/api/persons/:id", (request, response) => {
+  const id = request.params.id;
+  Person.findById(id).then((person) => {
+    response.json(person);
+  });
+});
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    persons = persons.filter((person) => person.id !== id)
+// app.delete('/api/persons/:id', (request, response) => {
+//     const id = request.params.id
+//     persons = persons.filter((person) => person.id !== id)
 
-    response.status(204).end()
-})
+//     response.status(204).end()
+// })
 
-const generateId = () => {
-    return String(Math.floor(Math.random() * 10000))
-}
+// const generateId = () => {
+//     return String(Math.floor(Math.random() * 10000))
+// }
 
-app.post('/api/persons', (request, response) => {
-    const body = request.body
-    console.log(body)
+// app.post('/api/persons', (request, response) => {
+//     const body = request.body
+//     console.log(body)
 
-    if(!body.name || !body.number) {
-        return response.status(400).json({
-            error: 'name or number missing'
-        })
-    }
+//     if(!body.name || !body.number) {
+//         return response.status(400).json({
+//             error: 'name or number missing'
+//         })
+//     }
 
-    if(persons.some((person) => person.name === body.name)) {
-        return response.status(400).json({
-            error: 'name already in phonebook'
-        })
-    }
+//     if(persons.some((person) => person.name === body.name)) {
+//         return response.status(400).json({
+//             error: 'name already in phonebook'
+//         })
+//     }
 
-    const newPerson = {
-        id: generateId(),
-        name: body.name,
-        number: body.number,
-    }
+//     const newPerson = {
+//         id: generateId(),
+//         name: body.name,
+//         number: body.number,
+//     }
 
-    persons = persons.concat(newPerson)
+//     persons = persons.concat(newPerson)
 
-    response.json(newPerson)
-})
+//     response.json(newPerson)
+// })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
-    console.log(`listening on port: ${PORT}`)
-})
+  console.log(`listening on port: ${PORT}`);
+});
